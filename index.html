@@ -1,0 +1,195 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT WEB CLIENT</title>
+
+    <!-- Added the Bootstrap CDN -->
+    <!-- Latest compiled and minified CSS,JS,JQUERY -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+        crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+    <!-- SWEET ALERT -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="icon.png">
+
+
+</head>
+
+
+<body>
+    <nav class="navbar navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">MQTT WEB CLIENT</a>
+    </nav>
+    <div class="container-fluid mt-3">
+        <!-- THE BROKER SECTION -->
+        <div class="container">
+            <div class="card shadow">
+                <div class="card-header d-flex justify-content-between">
+                    <h5>Choose broker</h5>
+                    <span id="indicator" class="dot"></span>
+                </div>
+                <div class="card-body">
+                    <span class="">CHOOSE FROM DEFAULT BROKERS </span>
+                    <div class="input-group mb-3">
+                        <select class="custom-select" id="dftBroker">
+                            <option value="" selected>Choose...</option>
+                            <option value="wss://test.mosquitto.org:8081/mqtt">wss://test.mosquitto.org:8081/mqtt</option>
+                            <option value="wss://mqtt.eclipse.org:443/mqtt">wss://mqtt.eclipse.org:443/mqtt</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <label class="mt-2" for="broker">BROKER:</label>
+                        <input id="broker" type="text" class="form-control ml-1" placeholder="Input your own broker..."
+                            aria-label="Username" aria-describedby="basic-addon1">
+                    </div>
+                    <div id="alertcntdBroker" style="display:none" class="alert alert-success mb-0" role="alert">
+                        <span><strong>Your now connected to: </strong><i id="connectedBroker"></i></span>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div id="disconnectedBroker" style="display:none" class="alert alert-danger mb-0" role="alert">
+                        <span><strong>Disconnected to: </strong><i id="discntdBroker"></i></span>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-footer justify-content-end">
+                    <div class="d-flex justify-content-end">
+                        <button id="disconnect" type="button" disabled class="btn btn-danger mx-2">Disconnect</button>
+                        <button id="connect" type="button" class="btn btn-primary mx-2">Connect</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END OF BROKER SECTION -->
+
+        <!-- THE BODY SECTION -->
+        <div class="container-fluid mt-4">
+            <div class="row bg-white shadow rounded">
+                <div class="col-sm-5">
+                    <div class="container-fluid  p-2 mt-2">
+                        <h5>PUBLISH</h5>
+                        <hr>
+                        <div class="input-group mb-3">
+                            <label class="mt-2" for="pubTopic"><b>Topic:</b></label>
+                            <input id="pubTopic" type="text" disabled class="form-control ml-1" placeholder="Topic..."
+                                aria-label="Username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="payload"><b>Message</b></label>
+                            <textarea style="resize: none;" disabled class="form-control" rows="5" id="payload"></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button id="pub" type="submit" disabled class="btn btn-primary mx-2">Publish</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm">
+                    <div class="container-fluid mt-2 p-2">
+                        <h5>SUBSCRIBE</h5>
+                        <hr>
+                        <div class="container mb-3">
+                            <input id="subTopic" disabled type="text" class="form-control" placeholder="Input topic to subscribe....."
+                                aria-label="Example text with button addon" aria-describedby="button-addon1">
+                            <div class="d-flex justify-content-end">
+                                <button id="subscribebtn" class="btn btn-primary mt-1 mx-1" disabled type="button" id="button-addon1">Subscribe</button>
+                            </div>
+                        </div>
+                        <table id="recievedMsg" class="table">
+                            <div class="d-flex justify-content-between">
+                                <h5>Messages</h5>
+                            </div>
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">TOPIC</th>
+                                    <th scope="col">MESSAGE</th>
+                                    <th scope="col">TIMESTAMP</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid mt-5 bg-white mb-4">
+            <h4>RECORDS</h4>
+            <hr>
+            <div class="row bg-secondary shadow rounded mx-1">
+                <div class="col-sm">
+                    <table id="published-message" class="table bg-white rounded">
+                        <div class="d-flex justify-content-between">
+                            <h6>PUBLISHED MESSAGES</h6>
+                        </div>
+                        <thead class="thead-white">
+                            <tr>
+                                <th scope="col">TOPIC</th>
+                                <th scope="col">MESSAGE</th>
+                                <th scope="col">TIMESTAMP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm">
+                    <table id="subscribe-topic" class="table bg-white rounded">
+                        <div class="d-flex justify-content-between">
+                            <h6>SUBSCRIBED TOPIC</h6>
+                        </div>
+                        <thead class="thead-white">
+                            <tr>
+                                <th scope="col">TOPIC</th>
+                                <th scope="col">TIMESTAMP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <hr>
+        </div>
+    </div>
+    
+   <!-- Site footer -->
+   <footer class="site-footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 col-sm-6 col-xs-12">
+          <p class="copyright-text">Copyright &copy; 2020 All Rights Reserved by 
+       <a href="#">John Paul Vistal</a>.
+          </p>
+        </div>
+
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          <ul class="social-icons">
+            <li><a class="facebook" href="#"><i class="fa fa-facebook"></i></a></li>
+            <li><a class="twitter" href="#"><i class="fa fa-twitter"></i></a></li>
+            <li><a class="google" href="#"><i class="fa fa-google"></i></a></li>
+            <li><a class="linkedin" href="#"><i class="fa fa-linkedin"></i></a></li>   
+          </ul>
+        </div>
+      </div>
+    </div>
+</footer>
+
+
+</body>
+<script src="./browserMqtt.js"></script>
+<script src="./script.js"></script>
+
+</html>

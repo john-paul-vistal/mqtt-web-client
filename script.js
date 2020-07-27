@@ -121,6 +121,7 @@ $(document).ready(function () {
             $('#connect').attr('disabled',true);
             $('#pubTopic').attr('disabled',true);
             $('#subTopic').attr('disabled',true);
+            $('#subTopic').val('');
             $('#payload').attr('disabled',true);
             $('#connect').removeAttr('disabled');
             setTimeout(function () {
